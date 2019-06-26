@@ -45,7 +45,7 @@ class Trial():
         realPlayerGrid=self.checkBoundary(playerGrid)
         self.drawNewState(bean1Grid,bean2Grid,realPlayerGrid)
         reactionTime.append(time.get_ticks() - initialTime)
-        trajectory.append(list(playerGrid))
+        trajectory.append(list(realPlayerGrid))
         actionList.append(action)
         stepCount=stepCount+1
         pause = self.checkTerminationOfTrial(action, eatenFlag)
@@ -53,9 +53,9 @@ class Trial():
             playerGrid, action = self.humanController(bean1Grid, bean2Grid, realPlayerGrid)
             eatenFlag = self.checkEaten(bean1Grid, bean2Grid, playerGrid)
             realPlayerGrid = self.checkBoundary(playerGrid)
-            self.drawNewState(bean1Grid, bean2Grid, playerGrid)
+            self.drawNewState(bean1Grid, bean2Grid, realPlayerGrid)
             reactionTime.append(time.get_ticks() - reactionTime[-1])
-            trajectory.append(list(playerGrid))
+            trajectory.append(list(realPlayerGrid))
             actionList.append(action)
             stepCount = stepCount + 1
             pause = self.checkTerminationOfTrial(action, eatenFlag)

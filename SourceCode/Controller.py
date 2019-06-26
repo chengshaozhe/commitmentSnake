@@ -52,6 +52,7 @@ class ModelController():
 		self.policy=policy
 		self.gridSize=gridSize
 		self.softmaxBeta=softmaxBeta
+		self.actionSpace = [(0, -1), (0, 1), (-1, 0), (1, 0)]
 
 	def __call__(self,targetPositionA,targetPositionB,playerPosition):
 		try:
