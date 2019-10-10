@@ -16,12 +16,6 @@ from Trial import Trial
 from math import ceil
 from collections import Counter
 
-def createAllCertainFormatFileList(filePath, fileFormat):
-    filenameList = [os.path.join(filePath, relativeFilename) for relativeFilename in os.listdir(filePath)
-                    if os.path.isfile(os.path.join(filePath, relativeFilename))
-                    if os.path.splitext(relativeFilename)[1] in fileFormat]
-    return filenameList
-
 
 class Experiment():
     def __init__(self, trial, writer, experimentValues, initialWorld, updateWorld, drawImage, resultsPath, \
@@ -62,13 +56,14 @@ class Experiment():
 
 
 def main():
-    resultsPath = os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + '/Results/'
-    fileFormat = '.csv'
-    resultsFilenameList = createAllCertainFormatFileList(resultsPath, fileFormat)
-    resultsDataFrameList = [pd.read_csv(file) for file in resultsFilenameList]
-    resultsDataFrame = pd.concat(resultsDataFrameList, sort=False)
     dimension = 15
     bounds = [0, 0, dimension - 1,dimension - 1]
+    condition = [-5, -3, -1, 0, 1, 3, 5]
+    minDistanceBetweenGrids = max(condition) + 1
+    maxDistanceBetweenGrids = UpdateWorld.calculateMaxDistanceOfGrid(bounds) - minDistanceBetweenGrids
+    block=15
+    initialWorld = UpdateWorld.InitialWorld(bounds)
+    updateWorld = UpdateWorld.UpdateWorld(bounds, condition, minDistanceBetweenGrids,maxDistanceBetweenGrids)
     pg.init()
     screenWidth = 680
     screenHeight = 680
@@ -82,19 +77,42 @@ def main():
     targetRadius = 10
     playerRadius = 10
     textColorTuple = (255, 50, 50)
+    softmaxBeta = -1
+    episilonGreedy=0.8
     pg.event.set_allowed([pg.KEYDOWN, pg.QUIT])
-    designValues=list(range(resultsDataFrame.shape[0]))
-    updateWorld =UpdateWorld(resultsDataFrame,[4,5],[6,7],[8,9])
+    picturePath = os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + '/Pictures/'
+    resultsPath = os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + '/Results/'
+    policyPath=os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + '/machinePolicy/'
     humanController = HumanController(dimension)
-    controller = humanController
-    experimentValues = co.OrderedDict()
-    drawBackground = DrawBackground(screen, dimension, leaveEdgeSpace, backgroundColor, lineColor, lineWidth,
-                                    textColorTuple)
-    checkBoundary = CheckBoundary([0, dimension-1 ], [0, dimension -1])
-    drawNewState = DrawNewState(screen, drawBackground, targetColor, playerColor, targetRadius, playerRadius)
-    trial = Trial(controller, drawNewState, checkBoundary)
-    experiment = Experiment(trial, experimentValues, updateWorld )
-    experiment(designValues)
+    policyFile = open(policyPath + "SingleWolfTwoSheepsGrid15.pkl", "rb")
+    policy = pickle.load(policyFile)
+    modelController = ModelController(policy, dimension, softmaxBeta,episilonGreedy)
+    controller = modelController
+    numberOfMachineRun=50
+    for i in range (numberOfMachineRun):
+        experimentValues = co.OrderedDict()
+        # experimentValues["name"] = input("Please enter your name:").capitalize()
+        experimentValues["name"] = 'machineEpisilon'+str(episilonGreedy)+"_"+str(i)
+        experimentValues["condition"] = 'None'
+        writerPath = resultsPath + experimentValues["name"] + '.csv'
+        writer = WriteDataFrameToCSV(writerPath)
+        introductionImage = pg.image.load(picturePath + 'introduction.png')
+        restImage = pg.image.load(picturePath + 'rest.png')
+        finishImage = pg.image.load(picturePath + 'finish.png')
+        introductionImage=pg.transform.scale(introductionImage, (screenWidth,screenHeight))
+        finishImage=pg.transform.scale(finishImage, (int(screenWidth*2/3),int(screenHeight/4)))
+        drawBackground = DrawBackground(screen, dimension, leaveEdgeSpace, backgroundColor, lineColor, lineWidth,
+                                        textColorTuple)
+        checkBoundary = CheckBoundary([0, dimension-1 ], [0, dimension -1])
+        drawNewState = DrawNewState(screen, drawBackground, targetColor, playerColor, targetRadius, playerRadius)
+        drawImage = DrawImage(screen)
+        designValues=UpdateWorld.createDesignValues(condition*3,block)
+        restTrial=list(range(0,len(designValues),len(condition)*15))
+        trial = Trial(controller, drawNewState, checkBoundary)
+        experiment = Experiment(trial, writer, experimentValues, initialWorld, updateWorld, drawImage, resultsPath,
+                                 minDistanceBetweenGrids,maxDistanceBetweenGrids,restImage,finishImage,restTrial)
+        #drawImage(introductionImage)
+        experiment(designValues)
 
 
 

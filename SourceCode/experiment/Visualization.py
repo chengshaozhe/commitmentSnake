@@ -2,8 +2,6 @@ import pygame as pg
 import numpy as np
 import os
 
-
-
 def drawText(screen,text,textColorTuple,textPositionTuple):
 	font = pg.font.Font(None,50)
 	textObj=font.render(text, 1, textColorTuple)

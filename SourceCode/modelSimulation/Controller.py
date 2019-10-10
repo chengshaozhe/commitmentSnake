@@ -84,43 +84,6 @@ class ModelController():
 		pg.time.delay(0)
 		return aimePlayerGrid, action
 
-class ExitedTrajectoryController():
-	def __init__(self,policy,gridSize,softmaxBeta,episilonGreedy):
-		self.policy=policy
-		self.gridSize=gridSize
-		self.softmaxBeta=softmaxBeta
-		self.episilonGreedy=episilonGreedy
-		self.actionSpace = ((0, -1), (0, 1), (-1, 0), (1, 0))
-
-	def __call__(self,targetPositionA,targetPositionB,playerPosition):
-		try:
-			policyForCurrentStateDict = self.policy[ (playerPosition,(targetPositionA, targetPositionB))]
-		except KeyError as e:
-			policyForCurrentStateDict = self.policy[ (playerPosition,(targetPositionB, targetPositionA))]
-		if self.softmaxBeta < 0:
-			actionMaxList = [action for action in policyForCurrentStateDict.keys() if
-							 policyForCurrentStateDict[action] == np.max(list(policyForCurrentStateDict.values()))]
-			if random.random()<self.episilonGreedy:
-				action = random.choice(actionMaxList)
-			else:
-				minActionSpace=list(self.actionSpace)
-				try:
-					for maxAction in actionMaxList:
-						minActionSpace.remove(maxAction)
-						action=random.choice(minActionSpace)
-				except IndexError as e:
-					action=random.choice(actionMaxList)
-					print(actionMaxList)
-		else:
-			actionProbability = np.divide(list(policyForCurrentStateDict.values()),
-										  np.sum(list(policyForCurrentStateDict.values())))
-			softmaxProbabilityList = calculateSoftmaxProbability(list(actionProbability), self.softmaxBeta)
-			action = list(policyForCurrentStateDict.keys())[
-				list(np.random.multinomial(1, softmaxProbabilityList)).index(1)]
-		aimePlayerGrid = tuple(np.add(playerPosition, action))
-		pg.time.delay(0)
-		return aimePlayerGrid, action
-
 if __name__=="__main__":
 	pg.init()
 	screenWidth=720
