@@ -34,7 +34,7 @@ def calculateFirstIntentionStep(data):
     return firstIntention
 
 if __name__=="__main__":
-    resultsPath = os.path.abspath(os.path.join(os.getcwd(),"../.." )) + '/Results/'
+    resultsPath = os.path.abspath(os.path.join(os.getcwd(),"../.." )) + '/Results/human'
     fileFormat = '.csv'
     resultsFilenameList = createAllCertainFormatFileList(resultsPath, fileFormat)
     resultsDataFrameList = [pd.read_csv(file) for file in resultsFilenameList]
