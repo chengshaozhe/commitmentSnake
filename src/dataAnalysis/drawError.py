@@ -28,7 +28,6 @@ import numpy as np
 # plt.show()
 
 
-
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
@@ -54,8 +53,8 @@ n_groups = 2
 # stdFirstIntentionStep=[2.955086931,0]
 
 # totalTrialData
-meansFirstIntentionFrequency = [0.211205996070641,0.108141089154123]
-stdFirstIntentionFrequency = [0.0128759491803434,0.00110461485996821]
+meansFirstIntentionFrequency = [0.21080984708074219, 0.1143020482603816]
+stdFirstIntentionFrequency = [0.012874340446825517, 0.004090790669871936]
 fig, ax = plt.subplots()
 
 index = np.arange(n_groups)
@@ -72,8 +71,8 @@ rects1 = ax.bar(index, meansFirstIntentionFrequency, bar_width,
 ax.set_xlabel('participants')
 ax.set_ylabel('ratio')
 ax.set_title('avoid commitment ratio')
-ax.set_xticks(index )
-ax.set_xticklabels(('human','model'))
+ax.set_xticks(index)
+ax.set_xticklabels(('human', 'model'))
 ax.legend()
 
 # rects1 = ax.bar(index, meansFirstIntentionStep, bar_width,
