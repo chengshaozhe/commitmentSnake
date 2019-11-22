@@ -42,17 +42,18 @@ if __name__ == '__main__':
 
         df["eatOld"] = df.apply(lambda x: isEatOld(x['beanEaten']), axis=1)
 
-        statDF['eatOldRatio'] = df.groupby('condition')["eatOld"].mean().sort_values()
+        df.condition = df.apply(lambda x: eval(x['condition']),axis=1)
+        statDF['eatOldRatio'] = df.groupby('condition')["eatOld"].mean().sort_index()
         statDF['eatOldRatioSE'] = df.groupby('condition')["eatOld"].apply(calculateSE)
         print(statDF)
 
        # statDF.to_csv("statDF.csv")
         print('eatOldRatio', np.mean(statDF['eatOldRatio']))
         print('')
-        commitmentRatioList.append(statDF['eatOldRatio'].tolist())
-        stdList.append(statDF['eatOldRatioSE'].tolist())
+        commitmentRatioList.append(statDF['eatOldRatio'])
+        stdList.append(statDF['eatOldRatioSE'])
 
-    condition = ['-5', '-3', '-1', '0', '1', '3', '5']
+    condition = sorted(set(df.condition))
     x = np.arange(len(condition))
     totalWidth, n = 0.6, len(participants)
     width = totalWidth / n
