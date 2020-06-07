@@ -14,7 +14,7 @@ if __name__ == '__main__':
     resultsPath = os.path.join(os.path.join(DIRNAME, '../..'), 'results')
     statsList = []
     stdList = []
-    participants = ['human', 'maxModel']
+    participants = ['human', 'softMaxBeta2.5', 'max']
     for participant in participants:
         dataPath = os.path.join(resultsPath, participant)
         df = pd.concat(map(pd.read_csv, glob.glob(os.path.join(dataPath, '*.csv'))), sort=False)
@@ -43,7 +43,7 @@ if __name__ == '__main__':
         print('firstIntentionRatio', np.mean(statDF['firstIntentionRatio']))
 
         statsList.append([np.mean(statDF['firstIntentionRatio']), np.mean(statDF['avoidCommitmentRatio'])])
-        stdList.append([calculateSE(statDF['firstIntentionRatio']),calculateSE(statDF['avoidCommitmentRatio'])])
+        stdList.append([calculateSE(statDF['firstIntentionRatio']), calculateSE(statDF['avoidCommitmentRatio'])])
 
     xlabels = ['firstIntentionRatio', 'avoidCommitmentAreaRatio']
     labels = participants
@@ -52,7 +52,7 @@ if __name__ == '__main__':
     width = totalWidth / n
     x = x - (totalWidth - width) / 2
     for i in range(len(statsList)):
-        plt.bar(x + width * i, statsList[i],yerr =stdList[i] , width=width, label=labels[i])
+        plt.bar(x + width * i, statsList[i], yerr=stdList[i], width=width, label=labels[i])
     plt.xticks(x, xlabels)
     plt.ylim((0, 0.5))
     plt.legend(loc='best')

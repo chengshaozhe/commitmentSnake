@@ -1,8 +1,10 @@
 import numpy as np
 
+
 def calculateSE(data):
-    standardError = np.std(data) / np.sqrt(len(data) - 1)
+    standardError = np.std(data, ddof=1) / np.sqrt(len(data) - 1)
     return standardError
+
 
 def calculateGridDis(grid1, grid2):
     gridDis = np.linalg.norm(np.array(grid1) - np.array(grid2), ord=1)

@@ -30,7 +30,7 @@ def judgeStraightCondition(player, target1, target2):
 
 
 if __name__ == "__main__":
-    resultsPath = os.path.abspath(os.path.join(os.getcwd(), "../..")) + '/Results/'
+    resultsPath = os.path.abspath(os.path.join(os.getcwd(), "../..")) + '/results/'
     fileFormat = '.csv'
     writerPath = resultsPath + str("machineMaxDeleteStraightCondition.csv")
     resultsFilenameList = createAllCertainFormatFileList(resultsPath, fileFormat)
