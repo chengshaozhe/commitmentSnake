@@ -34,7 +34,7 @@ if __name__ == '__main__':
     resultsPath = os.path.join(os.path.join(DIRNAME, '../..'), 'results')
     commitmentRatioList = []
     stdList = []
-    participants = ['human', 'softMaxBeta0.5']
+    participants = ['human', 'softMaxBeta1']
     for participant in participants:
         dataPath = os.path.join(resultsPath, participant)
         df = pd.concat(map(pd.read_csv, glob.glob(os.path.join(dataPath, '*.csv'))), sort=False)
@@ -53,7 +53,7 @@ if __name__ == '__main__':
         df.condition = df.apply(lambda x: eval(x['condition']), axis=1)
         statDF['eatOldRatio'] = df.groupby('condition')["eatOld"].mean().sort_index()
         statDF['eatOldRatioSE'] = df.groupby('condition')["eatOld"].apply(calculateSE)
-        # print(statDF)
+        print(statDF)
 
        # statDF.to_csv("statDF.csv")
         print('eatOldRatio', np.mean(statDF['eatOldRatio']))
@@ -70,11 +70,15 @@ if __name__ == '__main__':
     x = x - (totalWidth - width) / 2
     for i in range(len(commitmentRatioList)):
         plt.bar(x + width * i, commitmentRatioList[i], yerr=stdList[i], width=width, label=labels[i])
-    plt.xticks(x, condition)
 
-    plt.xlabel('Distance Difference(new - old)')
-    plt.ylabel('Eat Old Ratio')
+    fontSize = 16
+
+    plt.xticks(x, condition, fontsize=fontSize, color='black')
+    plt.yticks(fontsize=fontSize, color='black')
+
+    plt.xlabel('Distance Difference(new - old)', fontsize=fontSize, color='black')
+    plt.ylabel('Reach Old Ratio', fontsize=fontSize, color='black')
     plt.ylim((0, 1))
     plt.legend(loc='best')
-    plt.title('Commitment to Future')
+    plt.title('Commitment to Future', fontsize=fontSize, color='black')
     plt.show()

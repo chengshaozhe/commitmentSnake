@@ -3,10 +3,6 @@ import pygame as pg
 from pygame import time
 import collections as co
 import pickle
-from Visualization import DrawBackground,DrawNewState,DrawImage
-from Controller import HumanController,ModelController,CheckBoundary
-import UpdateWorld
-
 
 
 def inferGoal(originGrid, aimGrid, targetGridA, targetGridB):
@@ -24,58 +20,51 @@ def inferGoal(originGrid, aimGrid, targetGridA, targetGridB):
         goal = 0
     return goal
 
-class Trial():
-    def __init__(self,controller,drawNewState,checkBoundary):
-        self.controller=controller
-        self.drawNewState=drawNewState
-        self.checkBoundary=checkBoundary
 
-    def checkEaten(self,bean1Grid, bean2Grid, humanGrid):
-        if np.linalg.norm(np.array(humanGrid) - np.array(bean1Grid), ord=1)==0:
-            eatenFlag=[True,False]
+class Trial():
+    def __init__(self, controller, drawNewState, checkBoundary):
+        self.controller = controller
+        self.drawNewState = drawNewState
+        self.checkBoundary = checkBoundary
+
+    def checkEaten(self, bean1Grid, bean2Grid, humanGrid):
+        if np.linalg.norm(np.array(humanGrid) - np.array(bean1Grid), ord=1) == 0:
+            eatenFlag = [True, False]
         elif np.linalg.norm(np.array(humanGrid) - np.array(bean2Grid), ord=1) == 0:
-            eatenFlag=[False,True]
+            eatenFlag = [False, True]
         else:
-            eatenFlag=[False,False]
+            eatenFlag = [False, False]
         return eatenFlag
 
-    def checkTerminationOfTrial(self,action,eatenFlag):
-        if np.any(eatenFlag)==True or action==pg.QUIT :
-            pause=False
+    def checkTerminationOfTrial(self, action, eatenFlag):
+        if np.any(eatenFlag) == True or action == pg.QUIT:
+            pause = False
         else:
-            pause=True
+            pause = True
         return pause
 
-    def __call__(self,bean1Grid,bean2Grid,playerGrid):
+    def __call__(self, bean1Grid, bean2Grid, playerGrid):
         initialPlayerGrid = playerGrid
-        initialTime = time.get_ticks()
         reactionTime = list()
-        actionList=list()
-        goalList=list()
+        actionList = list()
+        goalList = list()
         trajectory = [initialPlayerGrid]
-        pg.event.set_allowed([pg.KEYDOWN, pg.KEYUP,pg.QUIT])
-        results=co.OrderedDict()
-        self.drawNewState(bean1Grid,bean2Grid,initialPlayerGrid)
-        stepCount=0
-        playerGrid, action= self.controller(bean1Grid, bean2Grid, playerGrid)
-        goal = inferGoal(trajectory[-1], playerGrid, bean1Grid, bean2Grid)
-        goalList.append(goal)
-        eatenFlag = self.checkEaten(bean1Grid, bean2Grid, playerGrid)
-        realPlayerGrid=self.checkBoundary(playerGrid)
-        self.drawNewState(bean1Grid,bean2Grid,realPlayerGrid)
-        reactionTime.append(time.get_ticks() - initialTime)
-        trajectory.append(list(realPlayerGrid))
-        actionList.append(action)
-        stepCount=stepCount+1
-        pause = self.checkTerminationOfTrial(action, eatenFlag)
+        stepCount = 0
+        pg.event.set_allowed([pg.KEYDOWN, pg.KEYUP, pg.QUIT])
+        results = co.OrderedDict()
+        self.drawNewState(bean1Grid, bean2Grid, initialPlayerGrid)
+
+        realPlayerGrid = initialPlayerGrid
+        pause = True
+        initialTime = time.get_ticks()
         while pause:
             playerGrid, action = self.controller(bean1Grid, bean2Grid, realPlayerGrid)
+            reactionTime.append(time.get_ticks() - initialTime)
             goal = inferGoal(trajectory[-1], playerGrid, bean1Grid, bean2Grid)
             goalList.append(goal)
             eatenFlag = self.checkEaten(bean1Grid, bean2Grid, playerGrid)
             realPlayerGrid = self.checkBoundary(playerGrid)
             self.drawNewState(bean1Grid, bean2Grid, realPlayerGrid)
-            reactionTime.append(time.get_ticks() - reactionTime[-1])
             trajectory.append(list(realPlayerGrid))
             actionList.append(action)
             stepCount = stepCount + 1
@@ -90,18 +79,11 @@ class Trial():
         results["reactionTime"] = str(reactionTime)
         results["trajectory"] = str(trajectory)
         results["aimAction"] = str(actionList)
-        results["goal"]=str(goalList)
+        results["goal"] = str(goalList)
         if True in eatenFlag:
-            results["beanEaten"] = eatenFlag.index(True)+1
-            oldGrid=eval('bean'+str(eatenFlag.index(False)+1)+'Grid')
+            results["beanEaten"] = eatenFlag.index(True) + 1
+            oldGrid = eval('bean' + str(eatenFlag.index(False) + 1) + 'Grid')
         else:
             results["beanEaten"] = 0
-            oldGrid=None
-        return results,oldGrid,playerGrid
-
-
-
-
-
-
-
+            oldGrid = None
+        return results, oldGrid, playerGrid
