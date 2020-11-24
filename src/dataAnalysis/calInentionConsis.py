@@ -34,7 +34,8 @@ if __name__ == '__main__':
     resultsPath = os.path.join(os.path.join(DIRNAME, '../..'), 'results')
     commitmentRatioList = []
     stdList = []
-    participants = ['human', 'softMaxBeta1']
+    statDFList = []
+    participants = ['human', 'softmaxBeta2.5']
     for participant in participants:
         dataPath = os.path.join(resultsPath, participant)
         df = pd.concat(map(pd.read_csv, glob.glob(os.path.join(dataPath, '*.csv'))), sort=False)
@@ -53,7 +54,7 @@ if __name__ == '__main__':
         df.condition = df.apply(lambda x: eval(x['condition']), axis=1)
         statDF['eatOldRatio'] = df.groupby('condition')["eatOld"].mean().sort_index()
         statDF['eatOldRatioSE'] = df.groupby('condition')["eatOld"].apply(calculateSE)
-        print(statDF)
+        # print(statDF)
 
        # statDF.to_csv("statDF.csv")
         print('eatOldRatio', np.mean(statDF['eatOldRatio']))
@@ -65,14 +66,13 @@ if __name__ == '__main__':
     x = np.arange(len(condition))
     totalWidth, n = 0.6, len(participants)
 
-    labels = ['human', 'RL agent']
+    labels = ['Human', 'RL Agent']
     width = totalWidth / n
     x = x - (totalWidth - width) / 2
     for i in range(len(commitmentRatioList)):
         plt.bar(x + width * i, commitmentRatioList[i], yerr=stdList[i], width=width, label=labels[i])
 
     fontSize = 16
-
     plt.xticks(x, condition, fontsize=fontSize, color='black')
     plt.yticks(fontsize=fontSize, color='black')
 

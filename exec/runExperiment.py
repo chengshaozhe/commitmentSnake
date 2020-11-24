@@ -4,6 +4,7 @@ import collections as co
 import numpy as np
 import pickle
 import sys
+import math
 sys.path.append(os.path.join(os.path.join(os.path.dirname(__file__), '..')))
 from src.Visualization import DrawBackground, DrawNewState, DrawImage
 from src.Controller import HumanController, CheckBoundary
@@ -64,7 +65,8 @@ def main():
     checkBoundary = CheckBoundary([0, dimension - 1], [0, dimension - 1])
     trial = Trial(controller, drawNewState, checkBoundary)
 
-    restTrial = list(range(0, len(designValues), len(condition) * 8))
+    restTrialInterval = math.ceil(len(designValues) / 6)
+    restTrial = list(range(0, len(designValues), restTrialInterval))
     experiment = Experiment(trial, writer, experimentValues, initialWorld, updateWorld, drawImage, resultsPath, minDistanceBetweenGrids, maxDistanceBetweenGrids, restImage, finishImage, restTrial)
     drawImage(introductionImage)
     experiment(designValues)

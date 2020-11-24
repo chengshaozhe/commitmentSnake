@@ -20,7 +20,7 @@ if __name__ == '__main__':
     stdList = []
     # participants = ['human', 'softmaxBeta0.5', 'rewardVariance5','rewardVariance10', 'rewardVariance30' ,'rewardVariance50']
 
-    participants = ['human','softmaxBeta0.1', 'softmaxBeta2.5', 'max']
+    participants = ['human', 'max']
     for participant in participants:
         dataPath = os.path.join(resultsPath, participant)
         df = pd.concat(map(pd.read_csv, glob.glob(os.path.join(dataPath, '*.csv'))), sort=False)
@@ -58,11 +58,12 @@ if __name__ == '__main__':
     xlabels = ['totalStep']
     labels = participants
     x = np.arange(len(xlabels))
-    totalWidth, n = 0.1, len(participants)
+    totalWidth, n = 0.2, len(participants)
     width = totalWidth / n
     x = x - (totalWidth - width) / 2
     for i in range(len(statsList)):
         plt.bar(x + width * i, statsList[i], yerr=stdList[i], width=width, label=labels[i])
+
     plt.xticks(x, xlabels)
     # plt.ylim((0, 10))
     plt.legend(loc='best')

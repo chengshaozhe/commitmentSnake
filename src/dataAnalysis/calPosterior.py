@@ -87,7 +87,7 @@ class CalFirstIntentionStepRatio:
 if __name__ == '__main__':
     machinePolicyPath = os.path.abspath(os.path.join(os.path.join(os.getcwd(), '../..'), 'machinePolicy'))
     Q_dict = pickle.load(open(os.path.join(machinePolicyPath, "noise0commitSnakeGoalGird15_policy.pkl"), "rb"))
-    softmaxBeta = 0.5
+    softmaxBeta = 1
     softmaxPolicy = SoftmaxPolicy(Q_dict, softmaxBeta)
     initPrior = [0.5, 0.5]
     inferThreshold = 0.95
@@ -187,7 +187,7 @@ if __name__ == '__main__':
             stdList.append(goalPosteriorStd)
 
     # lables = participants
-    lables = ['eatOld', 'eatNew']
+    lables = ['Reach Old', 'Reach New']
 
     xnew = np.linspace(0., 1., 30)
     for i in range(len(statsList)):

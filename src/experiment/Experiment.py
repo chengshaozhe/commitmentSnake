@@ -7,9 +7,9 @@ import os
 import pandas as pd
 import collections as co
 import numpy as np
-import  pickle
+import pickle
 from Visualization import DrawBackground, DrawNewState, DrawImage
-from Controller import HumanController,ModelController,CheckBoundary
+from Controller import HumanController, ModelController, CheckBoundary
 import UpdateWorld
 from Writer import WriteDataFrameToCSV
 from Trial import Trial
@@ -18,8 +18,8 @@ from collections import Counter
 
 
 class Experiment():
-    def __init__(self, trial, writer, experimentValues, initialWorld, updateWorld, drawImage, resultsPath, \
-                 minDistanceBetweenGrids,maxDistanceBetweenGrids,restImage,finishImage,restTrial):
+    def __init__(self, trial, writer, experimentValues, initialWorld, updateWorld, drawImage, resultsPath,
+                 minDistanceBetweenGrids, maxDistanceBetweenGrids, restImage, finishImage, restTrial):
         self.trial = trial
         self.writer = writer
         self.experimentValues = experimentValues
@@ -29,41 +29,40 @@ class Experiment():
         self.resultsPath = resultsPath
         self.minDistanceBetweenGrids = minDistanceBetweenGrids
         self.maxDistanceBetweenGrids = maxDistanceBetweenGrids
-        self.restImage=restImage
-        self.finishImage=finishImage
-        self.restTrial=restTrial
+        self.restImage = restImage
+        self.finishImage = finishImage
+        self.restTrial = restTrial
 
     def __call__(self, designValues):
-        bean1Grid, bean2Grid, playerGrid,angle = self.initialWorld(self.minDistanceBetweenGrids,self.maxDistanceBetweenGrids)
-        trialIndex=0
-        while trialIndex<len(designValues):
-            self.experimentValues["angle"]=angle
+        bean1Grid, bean2Grid, playerGrid, angle = self.initialWorld(self.minDistanceBetweenGrids, self.maxDistanceBetweenGrids)
+        trialIndex = 0
+        while trialIndex < len(designValues):
+            self.experimentValues["angle"] = angle
             results, bean1Grid, playerGrid = self.trial(bean1Grid, bean2Grid, playerGrid)
             response = self.experimentValues.copy()
             response.update(results)
             responseDF = pd.DataFrame(response, index=[trialIndex])
             self.writer(responseDF)
-            bean2Grid, nextCondition,angle = self.updateWorld(bean1Grid, playerGrid,designValues[trialIndex])
-            self.experimentValues["angle"]=angle
-            self.experimentValues["condition"]=nextCondition
-            designValues=UpdateWorld.adjustDesignValues(nextCondition, trialIndex, designValues)
-            trialIndex=trialIndex+1
-            #if trialIndex in self.restTrial:
-                #self.drawImage(self.restImage)
+            bean2Grid, nextCondition, angle = self.updateWorld(bean1Grid, playerGrid, designValues[trialIndex])
+            self.experimentValues["angle"] = angle
+            self.experimentValues["condition"] = nextCondition
+            designValues = UpdateWorld.adjustDesignValues(nextCondition, trialIndex, designValues)
+            trialIndex = trialIndex + 1
+            # if trialIndex in self.restTrial:
+            # self.drawImage(self.restImage)
 
-        #self.drawImage(self.finishImage)
-
+        # self.drawImage(self.finishImage)
 
 
 def main():
     dimension = 15
-    bounds = [0, 0, dimension - 1,dimension - 1]
+    bounds = [0, 0, dimension - 1, dimension - 1]
     condition = [-5, -3, -1, 0, 1, 3, 5]
     minDistanceBetweenGrids = max(condition) + 1
     maxDistanceBetweenGrids = UpdateWorld.calculateMaxDistanceOfGrid(bounds) - minDistanceBetweenGrids
-    block=15
+    block = 15
     initialWorld = UpdateWorld.InitialWorld(bounds)
-    updateWorld = UpdateWorld.UpdateWorld(bounds, condition, minDistanceBetweenGrids,maxDistanceBetweenGrids)
+    updateWorld = UpdateWorld.UpdateWorld(bounds, condition, minDistanceBetweenGrids, maxDistanceBetweenGrids)
     pg.init()
     screenWidth = 680
     screenHeight = 680
@@ -78,42 +77,41 @@ def main():
     playerRadius = 10
     textColorTuple = (255, 50, 50)
     softmaxBeta = -1
-    episilonGreedy=0.8
+    episilonGreedy = 0.8
     pg.event.set_allowed([pg.KEYDOWN, pg.QUIT])
     picturePath = os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + '/Pictures/'
     resultsPath = os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + '/Results/'
-    policyPath=os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + '/machinePolicy/'
+    policyPath = os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + '/machinePolicy/'
     humanController = HumanController(dimension)
     policyFile = open(policyPath + "SingleWolfTwoSheepsGrid15.pkl", "rb")
     policy = pickle.load(policyFile)
-    modelController = ModelController(policy, dimension, softmaxBeta,episilonGreedy)
+    modelController = ModelController(policy, dimension, softmaxBeta, episilonGreedy)
     controller = modelController
-    numberOfMachineRun=50
-    for i in range (numberOfMachineRun):
+    numberOfMachineRun = 20
+    for i in range(numberOfMachineRun):
         experimentValues = co.OrderedDict()
         # experimentValues["name"] = input("Please enter your name:").capitalize()
-        experimentValues["name"] = 'machineEpisilon'+str(episilonGreedy)+"_"+str(i)
+        experimentValues["name"] = 'machineEpisilon' + str(episilonGreedy) + "_" + str(i)
         experimentValues["condition"] = 'None'
         writerPath = resultsPath + experimentValues["name"] + '.csv'
         writer = WriteDataFrameToCSV(writerPath)
         introductionImage = pg.image.load(picturePath + 'introduction.png')
         restImage = pg.image.load(picturePath + 'rest.png')
         finishImage = pg.image.load(picturePath + 'finish.png')
-        introductionImage=pg.transform.scale(introductionImage, (screenWidth,screenHeight))
-        finishImage=pg.transform.scale(finishImage, (int(screenWidth*2/3),int(screenHeight/4)))
+        introductionImage = pg.transform.scale(introductionImage, (screenWidth, screenHeight))
+        finishImage = pg.transform.scale(finishImage, (int(screenWidth * 2 / 3), int(screenHeight / 4)))
         drawBackground = DrawBackground(screen, dimension, leaveEdgeSpace, backgroundColor, lineColor, lineWidth,
                                         textColorTuple)
-        checkBoundary = CheckBoundary([0, dimension-1 ], [0, dimension -1])
+        checkBoundary = CheckBoundary([0, dimension - 1], [0, dimension - 1])
         drawNewState = DrawNewState(screen, drawBackground, targetColor, playerColor, targetRadius, playerRadius)
         drawImage = DrawImage(screen)
-        designValues=UpdateWorld.createDesignValues(condition*3,block)
-        restTrial=list(range(0,len(designValues),len(condition)*15))
+        designValues = UpdateWorld.createDesignValues(condition * 3, block)
+        restTrial = list(range(0, len(designValues), len(condition) * 15))
         trial = Trial(controller, drawNewState, checkBoundary)
         experiment = Experiment(trial, writer, experimentValues, initialWorld, updateWorld, drawImage, resultsPath,
-                                 minDistanceBetweenGrids,maxDistanceBetweenGrids,restImage,finishImage,restTrial)
-        #drawImage(introductionImage)
+                                minDistanceBetweenGrids, maxDistanceBetweenGrids, restImage, finishImage, restTrial)
+        # drawImage(introductionImage)
         experiment(designValues)
-
 
 
 if __name__ == "__main__":
