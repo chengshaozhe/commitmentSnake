@@ -41,6 +41,10 @@ def main():
 
     picturePath = os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + '/pictures/'
     resultsPath = os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + '/results/'
+    drawBackground = DrawBackground(screen, dimension, leaveEdgeSpace, backgroundColor, lineColor, lineWidth, textColorTuple)
+    checkBoundary = CheckBoundary([0, dimension - 1], [0, dimension - 1])
+    drawNewState = DrawNewState(screen, drawBackground, targetColor, playerColor, targetRadius, playerRadius)
+    drawImage = DrawImage(screen)
 
     softmaxBeta = 2.5
     noise = 0
@@ -52,23 +56,23 @@ def main():
 
     numberOfMachineRun = 20
     for i in range(numberOfMachineRun):
-        experimentValues = co.OrderedDict()
-        experimentValues["name"] = "softmaxBeta" + str(softmaxBeta) + '_' + str(i)
-        resultsDirPath = os.path.join(resultsPath, "noise" + str(noise) + '_' + "softmaxBeta" + str(softmaxBeta))
-        if not os.path.exists(resultsDirPath):
-            os.mkdir(resultsDirPath)
-        experimentValues["condition"] = 'None'
-        writerPath = resultsDirPath + experimentValues["name"] + '.csv'
-        writer = WriteDataFrameToCSV(writerPath)
-        drawBackground = DrawBackground(screen, dimension, leaveEdgeSpace, backgroundColor, lineColor, lineWidth, textColorTuple)
-        checkBoundary = CheckBoundary([0, dimension - 1], [0, dimension - 1])
-        drawNewState = DrawNewState(screen, drawBackground, targetColor, playerColor, targetRadius, playerRadius)
-        drawImage = DrawImage(screen)
-        designValues = createDesignValues(condition * 3, block)
         renderOn = 1
         modelController = ModelControllerOnline(softmaxBeta)
         trial = SimulationTrial(modelController, drawNewState, checkBoundary, renderOn)
+
+        experimentValues = co.OrderedDict()
+        experimentValues["name"] = "softmaxBeta" + str(softmaxBeta) + '_' + str(i)
+        resultsDirPath = os.path.join(resultsPath, 'reward_' + str(goalReward[0]) + "noise" + str(noise) + '_' + "softmaxBeta" + str(softmaxBeta))
+
+        if not os.path.exists(resultsDirPath):
+            os.mkdir(resultsDirPath)
+        experimentValues["condition"] = 'None'
+        writerPath = os.path.join(resultsDirPath, experimentValues["name"] + '.csv')
+        writer = WriteDataFrameToCSV(writerPath)
+
         experiment = ModelSimulation(trial, writer, experimentValues, initialWorld, updateWorld, drawImage, resultsPath, minDistanceBetweenGrids, maxDistanceBetweenGrids, runVI)
+
+        designValues = createDesignValues(condition * 3, block)
         experiment(designValues)
 
 
