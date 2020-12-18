@@ -20,7 +20,7 @@ if __name__ == '__main__':
     stdList = []
     # participants = ['human', 'softmaxBeta0.5', 'rewardVariance5','rewardVariance10', 'rewardVariance30' ,'rewardVariance50']
 
-    participants = ['human', 'max']
+    participants = ['human', 'reward_30noise0_softmaxBeta2.5']
     for participant in participants:
         dataPath = os.path.join(resultsPath, participant)
         df = pd.concat(map(pd.read_csv, glob.glob(os.path.join(dataPath, '*.csv'))), sort=False)

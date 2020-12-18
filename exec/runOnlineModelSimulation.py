@@ -56,6 +56,7 @@ def main():
 
     numberOfMachineRun = 20
     for i in range(numberOfMachineRun):
+        print(i)
         renderOn = 1
         modelController = ModelControllerOnline(softmaxBeta)
         trial = SimulationTrial(modelController, drawNewState, checkBoundary, renderOn)

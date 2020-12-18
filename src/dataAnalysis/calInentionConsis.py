@@ -35,7 +35,7 @@ if __name__ == '__main__':
     commitmentRatioList = []
     stdList = []
     statDFList = []
-    participants = ['human', 'softmaxBeta2.5']
+    participants = ['human', 'reward_30noise0_softmaxBeta2.5']
     for participant in participants:
         dataPath = os.path.join(resultsPath, participant)
         df = pd.concat(map(pd.read_csv, glob.glob(os.path.join(dataPath, '*.csv'))), sort=False)
@@ -46,7 +46,7 @@ if __name__ == '__main__':
         df = cleanDataFrame(df)
         df['straightCondition'] = df.apply(lambda x: judgeStraightCondition((x['playerGridX'], x['playerGridY']), (x['bean1GridX'], x['bean1GridY']), (x['bean2GridX'], x['bean2GridY'])), axis=1)
 
-        df = df[df['straightCondition'] != 1]
+        # df = df[df['straightCondition'] != 1]
 
         statDF = pd.DataFrame()
         df["eatOld"] = df.apply(lambda x: isEatOld(x['beanEaten']), axis=1)

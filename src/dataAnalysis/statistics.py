@@ -33,7 +33,7 @@ def judgeStraightCondition(player, target1, target2):
 
 if __name__ == '__main__':
     resultsPath = os.path.join(os.path.join(DIRNAME, '../..'), 'results')
-    participants = ['human', 'softmaxBeta2.5']
+    participants = ['human', 'reward_30noise0_softmaxBeta2.5']
     dataPaths = [os.path.join(resultsPath, participant) for participant in participants]
     dfList = [pd.concat(map(pd.read_csv, glob.glob(os.path.join(dataPath, '*.csv'))), sort=False) for dataPath in dataPaths]
 
