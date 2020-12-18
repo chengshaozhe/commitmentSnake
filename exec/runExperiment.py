@@ -55,8 +55,7 @@ def main():
     finishImage = pg.image.load(picturePath + 'finish.png')
     introductionImage = pg.transform.scale(introductionImage, (screenWidth, screenHeight))
     finishImage = pg.transform.scale(finishImage, (int(screenWidth * 2 / 3), int(screenHeight / 4)))
-    drawBackground = DrawBackground(screen, dimension, leaveEdgeSpace, backgroundColor, lineColor, lineWidth,
-                                    textColorTuple)
+    drawBackground = DrawBackground(screen, dimension, leaveEdgeSpace, backgroundColor, lineColor, lineWidth, textColorTuple)
     drawNewState = DrawNewState(screen, drawBackground, targetColor, playerColor, targetRadius, playerRadius)
     drawImage = DrawImage(screen)
 

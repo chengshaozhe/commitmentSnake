@@ -87,7 +87,7 @@ class CalFirstIntentionStepRatio:
 if __name__ == '__main__':
     machinePolicyPath = os.path.abspath(os.path.join(os.path.join(os.getcwd(), '../..'), 'machinePolicy'))
     Q_dict = pickle.load(open(os.path.join(machinePolicyPath, "noise0commitSnakeGoalGird15_policy.pkl"), "rb"))
-    softmaxBeta = 1
+    softmaxBeta = 2.5
     softmaxPolicy = SoftmaxPolicy(Q_dict, softmaxBeta)
     initPrior = [0.5, 0.5]
     inferThreshold = 0.95
@@ -122,7 +122,10 @@ if __name__ == '__main__':
     resultsPath = os.path.join(os.path.join(DIRNAME, '../..'), 'results')
     statsList = []
     stdList = []
+    statDFList = []
     participants = ['human']  # ,'softMaxBeta2.5'
+    # participants = ['softMaxBeta2.5']
+
     for participant in participants:
         dataPath = os.path.join(resultsPath, participant)
         df = pd.concat(map(pd.read_csv, glob.glob(os.path.join(dataPath, '*.csv'))), sort=False)
@@ -186,6 +189,13 @@ if __name__ == '__main__':
             statsList.append(goalPosteriorMean)
             stdList.append(goalPosteriorStd)
 
+            def arrMean(df, colnames):
+                arr = np.array(df[colnames].tolist())
+                return np.mean(arr, axis=0)
+            grouped = pd.DataFrame(dfExpTrial.groupby('name').apply(arrMean, 'goalPosterior'))
+            statArr = np.array(grouped.iloc[:, 0].tolist()).T
+            statDFList.append(statArr)
+
     # lables = participants
     lables = ['Reach Old', 'Reach New']
 
@@ -193,6 +203,13 @@ if __name__ == '__main__':
     for i in range(len(statsList)):
         plt.plot(xnew, statsList[i], label=lables[i])
         # plt.errorbar(xnew, statsList[i], yerr=stdList[i], label=lables[i])
+
+    pvalus = np.array([ttest_ind(statDFList[0][i], statDFList[1][i])[1] for i in range(statDFList[0].shape[0])])
+    sigArea = np.where(pvalus < 0.01)[0]
+    xnewSig = xnew[sigArea]
+    ySig = [stats[sigArea] for stats in statsList]
+    for sigLine in [xnewSig[0], xnewSig[-1]]:
+        plt.plot([sigLine] * 10, np.linspace(0.5, 1., 10), color='black', linewidth=2, linestyle="--")
 
     # xlabels = ['firstIntentionStepRatio']
     # labels = participants

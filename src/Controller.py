@@ -15,6 +15,11 @@ class HumanController():
         pause = True
         while pause:
             for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    pg.quit()
+                if event.key == pg.K_ESCAPE:
+                    pg.quit()
+                    exit()
                 if event.type == pg.KEYDOWN:
                     if event.key in self.actionDict.keys():
                         action = self.actionDict[event.key]
@@ -82,6 +87,35 @@ class ModelController():
                 list(np.random.multinomial(1, softmaxProbabilityList)).index(1)]
         aimePlayerGrid = tuple(np.add(playerPosition, action))
         pg.time.delay(0)
+        return aimePlayerGrid, action
+
+
+def chooseMaxAcion(actionDict):
+    actionMaxList = [action for action in actionDict.keys() if
+                     actionDict[action] == np.max(list(actionDict.values()))]
+    action = random.choice(actionMaxList)
+    return action
+
+
+def chooseSoftMaxAction(actionDict, softmaxBeta):
+    actionValue = list(actionDict.values())
+    softmaxProbabilityList = calculateSoftmaxProbability(actionValue, softmaxBeta)
+    action = list(actionDict.keys())[
+        list(np.random.multinomial(1, softmaxProbabilityList)).index(1)]
+    return action
+
+
+class ModelControllerOnline:
+    def __init__(self, softmaxBeta):
+        self.softmaxBeta = softmaxBeta
+
+    def __call__(self, playerGrid, targetGrid1, targetGrid2, QDict):
+        actionDict = QDict[(playerGrid, (targetGrid1, targetGrid2))]
+        if self.softmaxBeta < 0:
+            action = chooseMaxAcion(actionDict)
+        else:
+            action = chooseSoftMaxAction(actionDict, self.softmaxBeta)
+        aimePlayerGrid = tuple(np.add(playerGrid, action))
         return aimePlayerGrid, action
 
 

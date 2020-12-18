@@ -33,7 +33,7 @@ def judgeStraightCondition(player, target1, target2):
 
 if __name__ == '__main__':
     resultsPath = os.path.join(os.path.join(DIRNAME, '../..'), 'results')
-    participants = ['human', 'max']
+    participants = ['human', 'softmaxBeta2.5']
     dataPaths = [os.path.join(resultsPath, participant) for participant in participants]
     dfList = [pd.concat(map(pd.read_csv, glob.glob(os.path.join(dataPath, '*.csv'))), sort=False) for dataPath in dataPaths]
 
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     df.condition = df.apply(lambda x: eval(x['condition']), axis=1)
 
     resultDf = df[df['condition'] == 0]
-
+    # resultDf = df
     # crosstab, res = researchpy.crosstab(resultDf['participantsType'], resultDf['eatOld'], test="chi-square")
     # print(crosstab)
     # print(res)
@@ -62,15 +62,16 @@ if __name__ == '__main__':
 
     statDFList = [humanDf['eatOldRatio'].tolist(), machineDf['eatOldRatio'].tolist()]
 
-    print(statDFList)
-    ttestDF = pd.DataFrame(np.array([statDFList[0], statDFList[1]]).T, columns=['human', 'model'])
-    des, res = researchpy.ttest(ttestDF['human'], ttestDF['model'])
+    des, res = researchpy.ttest(pd.Series(statDFList[0], name='human'), pd.Series(statDFList[1], name='RL'))
     print(des)
     print(res)
+    print('======')
+    from pingouin import ttest
+    print(ttest(statDFList[0], statDFList[1]).round(2))
 
 
 # viz all condition sum
-    VIZ = 0
+    VIZ = 1
     if VIZ:
         xlabels = ['Human', 'RL Agent']
         x = np.arange(len(xlabels))
@@ -91,5 +92,5 @@ if __name__ == '__main__':
         plt.ylabel('Reach Old Ratio', fontsize=fontSize, color='black')
         # plt.ylim((0, 1))
         plt.legend(loc='best')
-        plt.title('Commitment to Future', fontsize=fontSize, color='black')
+        plt.title('Commitment to Future: All conditions Merged', fontsize=fontSize, color='black')
         plt.show()

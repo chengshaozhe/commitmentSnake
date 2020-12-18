@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-
-# -*- coding: utf-8 -*-
-
 import pygame as pg
 import os
 import pandas as pd
@@ -15,6 +11,7 @@ from Writer import WriteDataFrameToCSV
 from Trial import Trial
 from math import ceil
 from collections import Counter
+DIRNAME = os.path.dirname(__file__)
 
 
 class Experiment():
@@ -76,19 +73,20 @@ def main():
     targetRadius = 10
     playerRadius = 10
     textColorTuple = (255, 50, 50)
-    softmaxBeta = -1
-    episilonGreedy = 0.8
+    softmaxBeta = 2.5
+    episilonGreedy = 1
     pg.event.set_allowed([pg.KEYDOWN, pg.QUIT])
-    picturePath = os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + '/Pictures/'
-    resultsPath = os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + '/Results/'
-    policyPath = os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + '/machinePolicy/'
+
+    picturePath = os.path.join(os.path.join(DIRNAME, '../..'), '/pictures/')
+    resultsPath = os.path.join(os.path.join(DIRNAME, '../..'), '/results/')
+    policyPath = os.path.join(os.path.join(DIRNAME, '../..'), 'machinePolicy/')
     humanController = HumanController(dimension)
-    policyFile = open(policyPath + "SingleWolfTwoSheepsGrid15.pkl", "rb")
+    policyFile = open(policyPath + "noise0commitSnakeGoalGird15_policy.pkl", "rb")
     policy = pickle.load(policyFile)
     modelController = ModelController(policy, dimension, softmaxBeta, episilonGreedy)
     controller = modelController
     numberOfMachineRun = 20
-    for i in range(numberOfMachineRun):
+    for i in range(16, numberOfMachineRun):
         experimentValues = co.OrderedDict()
         # experimentValues["name"] = input("Please enter your name:").capitalize()
         experimentValues["name"] = 'machineEpisilon' + str(episilonGreedy) + "_" + str(i)
